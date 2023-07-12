@@ -1,4 +1,5 @@
 import Game from './components/Game'
+import Header from './components/Header'
 import Index from './components/Index'
 import { useState } from 'react'
 
@@ -9,19 +10,12 @@ function App() {
 
 	const [currentPage, setCurrentPage] = useState('index')
 
-	const handleStartGame = () => {
-		console.log(
-			`starting game with 2*${n}+1 matches, ${m} maxMatches & player is gonna go first: ${
-				playerGoesFirst ? 'yes' : 'no'
-			}`
-		)
-
-		setCurrentPage('game')
-	}
+	const handleStartGame = () => setCurrentPage('game')
+	const handleLeaveGame = () => setCurrentPage('index')
 
 	return (
-		<div className="h-full bg-black text-neutral-200">
-
+		<div className="relative flex flex-col h-full bg-black text-neutral-200">
+			<Header onLeave={handleLeaveGame} disabled={currentPage === 'index'} />
 			{currentPage === 'index' && (
 				<Index
 					n={n}
@@ -33,7 +27,6 @@ function App() {
 					startGame={handleStartGame}
 				/>
 			)}
-
 			{currentPage === 'game' && <Game playerGoesFirst={playerGoesFirst} n={n} m={m} />}
 		</div>
 	)

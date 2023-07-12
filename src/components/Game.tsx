@@ -3,7 +3,6 @@ import { canWin, didPlayerWin, makeMove } from '../utils/game'
 import Modal from './Modal'
 import PlayButton from './PlayButton'
 import Avatar from './Avatar'
-import Match from './Match'
 import MatchContainer from './MatchContainer'
 interface GameProps {
 	playerGoesFirst: boolean
@@ -111,16 +110,16 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
 					<p>You were beaten by the 🤖 AI! Good luck next time.</p>
 				)}
 			</Modal>
-			<div className="flex flex-col items-center justify-center h-full">
+			<div className="flex flex-col items-center justify-between h-full">
 				<div className="flex flex-col items-center justify-center w-full max-w-md gap-8 p-8 sm:p-0 h-3/5">
 					<h1 className="text-9xl">{matches}</h1>
-					<div className="z-[5] grid justify-center w-full grid-cols-2 gap-8">
-						<Avatar name="You" matches={playerMatches} />
-						<Avatar name="CPU" isAI matches={computerMatches} />
+					<div className="z-[5] grid justify-center w-full grid-cols-2 gap-10">
+						<Avatar name="You" isAi={false} matches={playerMatches} />
+						<Avatar name="CPU" isAi matches={computerMatches} />
 					</div>
 					<MatchContainer startingMatches={startingMatches} matches={matches} seed={randomSeed} />
 				</div>
-				<div className="flex flex-wrap content-center justify-center gap-2 p-8 h-2/5 lg:p-0 lg:max-w-2xl">
+				<div className="flex flex-wrap content-center justify-center max-w-md gap-2 p-8 h-1/5 lg:p-0 lg:max-w-2xl">
 					{Array(m)
 						.fill('')
 						.map((_value, index) => (
