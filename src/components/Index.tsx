@@ -20,7 +20,7 @@ const Index: React.FC<IndexProps> = ({
 	startGame,
 }) => {
 	return (
-		<div className="flex items-center justify-between h-full max-w-2xl gap-24 p-12 mx-auto">
+		<div className="flex items-center justify-between max-w-2xl gap-24 p-12 mx-auto my-auto">
 			<div className="flex flex-col gap-8">
 				<div>
 					<input
