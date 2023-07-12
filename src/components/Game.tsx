@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { canWin } from '../utils/game'
-
+import { canWin, didPlayerWin, makeMove } from '../utils/game'
+import Modal from './Modal'
+import PlayButton from './PlayButton'
+import Avatar from './Avatar'
+import Match from './Match'
+import MatchContainer from './MatchContainer'
 interface GameProps {
 	playerGoesFirst: boolean
 	n: number
@@ -9,27 +13,33 @@ interface GameProps {
 
 const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
 	const startingMatches = 2 * n + 1
-	// m + 1
 
 	const [matches, setMatches] = useState(startingMatches)
 	const [playerMatches, setPlayerMatches] = useState(0)
 	const [computerMatches, setComputerMatches] = useState(0)
 	const [isPlayerTurn, setIsPlayerTurn] = useState(playerGoesFirst)
+	const [playerWon, setPlayerWon] = useState(false)
+
+	const [isOpen, setIsOpen] = useState(false)
+
+	const [randomSeed, setRandomSeed] = useState(Math.random())
 
 	const takeMatches = useCallback(
 		(amount: number, computer = false) => {
 			if (matches == 0) return false
-			if (matches - amount < 0) return false
 
-			setMatches(matches - amount)
+			const matchesLeft = matches - amount
+			if (matchesLeft < 0) return false
+
+			setMatches(matchesLeft)
+			// setArr(Array(matchesLeft).fill(''))
 
 			if (computer) {
-				// console.log(computerMatches + amount)
 				setComputerMatches(computerMatches + amount)
-				console.log(`%c-${amount} by player two. total: ${matches - amount}`, 'color: #bada55')
+				console.debug(`-${amount} by computer. total: ${matchesLeft}`)
 			} else {
 				setPlayerMatches(playerMatches + amount)
-				console.log(`%c-${amount} by player one. total: ${matches - amount}`, 'color: #5ad')
+				console.debug(`-${amount} by player. total: ${matchesLeft}`)
 			}
 
 			setIsPlayerTurn(!isPlayerTurn)
@@ -38,51 +48,94 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
 		[computerMatches, isPlayerTurn, matches, playerMatches]
 	)
 
+	const handleWin = useCallback(() => {
+		setPlayerWon(didPlayerWin(playerMatches))
+		setIsOpen(true)
+	}, [playerMatches])
+
 	useEffect(() => {
-		if (!isPlayerTurn) {
-			canWin(m, matches, computerMatches)
-			if ((matches - 3) % 4 === 0 || (matches - 3) % 4 === 1) {
-				takeMatches(3, true)
+		if (matches === 0) return handleWin()
+
+		if (matches === startingMatches && !playerGoesFirst) {
+			const winningMove = canWin(m, matches, computerMatches)
+
+			if (winningMove) {
+				takeMatches(winningMove, true)
 			} else {
-				takeMatches(1, true)
+				takeMatches(2, true)
 			}
+
+			return
 		}
-	}, [isPlayerTurn, takeMatches, matches, computerMatches, startingMatches, m])
+
+		if (!isPlayerTurn) {
+			const winningMove = canWin(m, matches, computerMatches)
+
+			if (winningMove) {
+				takeMatches(winningMove, true)
+				return
+			}
+
+			takeMatches(makeMove(matches, m), true)
+		}
+	}, [
+		isPlayerTurn,
+		takeMatches,
+		matches,
+		computerMatches,
+		m,
+		handleWin,
+		playerGoesFirst,
+		startingMatches,
+	])
 
 	const handleReset = () => {
 		setMatches(startingMatches)
 		setPlayerMatches(0)
 		setComputerMatches(0)
-		setIsPlayerTurn(true)
-		console.clear()
+		setIsPlayerTurn(playerGoesFirst)
+		setRandomSeed(Math.random())
 	}
+
 	return (
-		<div className="flex flex-col items-center justify-center h-full text-neutral-200 bg-black/95">
-			<div className="flex flex-col items-center justify-center h-1/2">
-				<h1 className="text-9xl">{matches}</h1>
-				<h3>Player #1: {playerMatches}</h3>
-				<h3>Player #2: {computerMatches}</h3>
+		<>
+			<Modal
+				isOpen={isOpen}
+				onClose={() => setIsOpen(false)}
+				result={playerWon ? 'win' : 'lose'}
+				title={playerWon ? 'Congratulations!' : 'You lost!'}
+				restart={handleReset}>
+				{playerWon ? (
+					<p>Well done, you've beaten the 🤖 AI!</p>
+				) : (
+					<p>You were beaten by the 🤖 AI! Good luck next time.</p>
+				)}
+			</Modal>
+			<div className="flex flex-col items-center justify-center h-full">
+				<div className="flex flex-col items-center justify-center w-full max-w-md gap-8 p-8 sm:p-0 h-3/5">
+					<h1 className="text-9xl">{matches}</h1>
+					<div className="z-[5] grid justify-center w-full grid-cols-2 gap-8">
+						<Avatar name="You" matches={playerMatches} />
+						<Avatar name="CPU" isAI matches={computerMatches} />
+					</div>
+					<MatchContainer startingMatches={startingMatches} matches={matches} seed={randomSeed} />
+				</div>
+				<div className="flex flex-wrap content-center justify-center gap-2 p-8 h-2/5 lg:p-0 lg:max-w-2xl">
+					{Array(m)
+						.fill('')
+						.map((_value, index) => (
+							<PlayButton
+								key={index}
+								text={(index + 1).toString()}
+								onClick={() => {
+									takeMatches(index + 1)
+								}}
+							/>
+						))}
+					<PlayButton onClick={handleReset} text="Reset" danger />
+				</div>
 			</div>
-			<div className="flex flex-wrap content-center justify-center gap-2 p-8 h-1/2 lg:p-0 lg:max-w-2xl">
-				{Array(m)
-					.fill('')
-					.map((_value, index) => (
-						<button
-							className="w-12 h-12 font-mono text-2xl font-semibold text-gray-400 bg-gray-200 border-4 border-gray-400 rounded"
-							key={index}
-							onClick={() => {
-								takeMatches(index + 1)
-							}}>
-							{index + 1}
-						</button>
-					))}
-				<button
-					className="h-12 px-2 font-mono text-2xl font-semibold text-red-700 uppercase bg-red-400 border-4 border-red-700 rounded"
-					onClick={handleReset}>
-					Reset
-				</button>
-			</div>
-		</div>
+		</>
 	)
 }
 

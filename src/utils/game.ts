@@ -6,14 +6,16 @@ export const makeMove = (matches: number, m: number) => {
 	}
 }
 
-export const canWin = (maxMatches: number, matches: number, playerMatches: number) => {
+export const canWin = (maxMatches: number, matches: number, computerMatches: number) => {
 	for (let i = 0; i < maxMatches; i++) {
 		if (matches - i === 0 || matches - i === 1) {
-			if ((playerMatches + i) % 2 === 0) {
-				console.log(`can win by taking ${i} matches resulting in ${matches - i} total.`)
+			if ((computerMatches + i) % 2 === 0) {
+				console.debug(`playing a non-standard move: -${i}`)
+				return i
 			}
 		}
 	}
+	return 0
 }
 
 export const clamp = (number: number, min: number, max: number) => {
