@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Transition } from '@headlessui/react'
+import clsx from 'clsx'
 
 interface AvatarProps {
   name: string
@@ -40,8 +41,12 @@ const Avatar: React.FC<AvatarProps> = ({ name, isAi, matches }) => {
         leave="transform duration-200 transition ease-in-out"
         leaveFrom="opacity-100 rotate-0 scale-100 "
         leaveTo="opacity-0 scale-95 "
-        className="absolute top-0 right-0 inline-flex flex-col items-center justify-end w-20 h-20 pb-4 overflow-hidden text-4xl text-green-500 translate-x-8 -translate-y-6 bg-white rounded-bl-none rounded-3xl">
-        <span className="absolute w-20 h-20 translate-y-4 from-white to-transparent bg-gradient-to-b"></span>
+        className={clsx(
+          'absolute inline-flex flex-col items-center justify-center overflow-hidden text-4xl text-green-500  bg-white w-16 h-16 sm:w-20 sm:h-20 rounded-3xl',
+          isAi && 'top-0 right-0 translate-x-8 -translate-y-6 rounded-bl-none',
+          !isAi && 'top-0 left-0 -translate-x-8 -translate-y-6 rounded-br-none'
+        )}>
+        <span className="absolute w-16 h-16 sm:w-20 sm:h-20 from-white/75 to-transparent bg-gradient-to-b"></span>
         <span>+{currentHistory}</span>
       </Transition>
       <span className="text-2xl font-bold">{name}</span>
