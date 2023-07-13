@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { canWin, didPlayerWin, makeMove } from '../utils/game'
+import { canWin, clamp, didPlayerWin, makeMove } from '../utils/game'
 import Modal from './Modal'
 import PlayButton from './PlayButton'
 import Avatar from './Avatar'
@@ -8,9 +8,10 @@ interface GameProps {
   playerGoesFirst: boolean
   n: number
   m: number
+  onBack: () => void
 }
 
-const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
+const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m, onBack }) => {
   const startingMatches = 2 * n + 1
 
   const [matches, setMatches] = useState(startingMatches)
@@ -22,16 +23,16 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const [randomSeed, setRandomSeed] = useState(Math.random())
+  const clampedMatches = clamp(m, 1, matches)
 
   const takeMatches = useCallback(
     (amount: number, computer = false) => {
-      if (matches == 0) return false
+      if (matches === 0) return false
 
       const matchesLeft = matches - amount
       if (matchesLeft < 0) return false
 
       setMatches(matchesLeft)
-      // setArr(Array(matchesLeft).fill(''))
 
       if (computer) {
         setComputerMatches(computerMatches + amount)
@@ -54,21 +55,15 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
 
   useEffect(() => {
     if (matches === 0) return handleWin()
+    if (isPlayerTurn) return
 
-    if (matches === startingMatches && !playerGoesFirst) {
-      const winningMove = canWin(m, matches, computerMatches)
+    const winningMove = canWin(clampedMatches, matches, computerMatches)
 
-      if (winningMove) {
-        takeMatches(winningMove, true)
-      } else {
-        takeMatches(2, true)
+    setTimeout(() => {
+      if (matches === startingMatches && !playerGoesFirst) {
+        takeMatches(winningMove || 2, true)
+        return
       }
-
-      return
-    }
-
-    if (!isPlayerTurn) {
-      const winningMove = canWin(m, matches, computerMatches)
 
       if (winningMove) {
         takeMatches(winningMove, true)
@@ -76,16 +71,17 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
       }
 
       takeMatches(makeMove(matches, m), true)
-    }
+    }, 1000)
   }, [
     isPlayerTurn,
-    takeMatches,
     matches,
+    clampedMatches,
     computerMatches,
-    m,
     handleWin,
+    m,
     playerGoesFirst,
     startingMatches,
+    takeMatches,
   ])
 
   const handleReset = () => {
@@ -102,19 +98,14 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         result={playerWon ? 'win' : 'lose'}
-        title={playerWon ? 'Congratulations!' : 'You lost!'}
-        restart={handleReset}>
-        {playerWon ? (
-          <p>Well done, you've beaten the 🤖 AI!</p>
-        ) : (
-          <p>You were beaten by the 🤖 AI! Good luck next time.</p>
-        )}
-      </Modal>
+        onRestart={handleReset}
+        onBack={onBack}
+      />
       <div className="flex flex-col items-center justify-between h-full">
         <div className="flex flex-col items-center justify-center w-full max-w-md gap-8 p-8 sm:p-0 h-3/5">
           <h1 className="text-9xl">{matches}</h1>
           <div className="z-[5] grid justify-center w-full grid-cols-2 gap-10">
-            <Avatar name="You" isAi={false} matches={playerMatches} />
+            <Avatar name="You" matches={playerMatches} />
             <Avatar name="CPU" isAi matches={computerMatches} />
           </div>
           <MatchContainer startingMatches={startingMatches} matches={matches} seed={randomSeed} />
@@ -129,6 +120,7 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m }) => {
                 onClick={() => {
                   takeMatches(index + 1)
                 }}
+                disabled={!isPlayerTurn || index + 1 > matches}
               />
             ))}
           <PlayButton onClick={handleReset} text="Reset" danger />

@@ -5,13 +5,12 @@ import clsx from 'clsx'
 interface ModalProps {
   isOpen?: boolean
   onClose: () => void
-  children: React.ReactNode
-  title: string
   result: 'win' | 'lose' | 'neutral'
-  restart: () => void
+  onRestart: () => void
+  onBack: () => void
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, result, title, restart }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, result, onRestart, onBack }) => {
   return (
     <>
       <Transition appear show={isOpen} as={Fragment}>
@@ -50,17 +49,23 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, result, title,
                       result === 'win' && 'text-green-400',
                       result === 'lose' && 'text-red-500'
                     )}>
-                    {title}
+                    {result === 'win' ? 'Congratulations.' : 'You Lost!'}
                   </Dialog.Title>
 
-                  <div className="text-neutral-200 text-md">{children}</div>
+                  <div className="text-neutral-200 text-md">
+                    {result === 'win' ? (
+                      <p>Well done, you've beaten the 🤖 AI!</p>
+                    ) : (
+                      <p>You were beaten by the 🤖 AI! Good luck next time.</p>
+                    )}
+                  </div>
 
                   <div className="flex justify-end gap-4 mt-4 text-white">
                     <button
                       type="button"
                       className="inline-flex justify-center px-4 py-2 text-sm border border-green-500 rounded-sm hover:bg-green-500"
                       onClick={() => {
-                        restart()
+                        onRestart()
                         onClose()
                       }}>
                       Restart
@@ -68,7 +73,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, result, title,
                     <button
                       type="button"
                       className="inline-flex justify-center px-4 py-2 text-sm border border-blue-600 rounded-sm hover:bg-blue-500"
-                      onClick={onClose}>
+                      onClick={onBack}>
                       Back to Home
                     </button>
                   </div>

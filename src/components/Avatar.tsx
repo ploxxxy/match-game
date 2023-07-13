@@ -3,7 +3,7 @@ import { Transition } from '@headlessui/react'
 
 interface AvatarProps {
   name: string
-  isAi: boolean
+  isAi?: boolean
   matches: number
 }
 
@@ -30,7 +30,7 @@ const Avatar: React.FC<AvatarProps> = ({ name, isAi, matches }) => {
   }, [matchHistory])
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 p-2 border rounded-sm select-none backdrop-blur-xl bg-neutral-900/10 border-neutral-500 aspect-square">
+    <div className="relative flex flex-col items-center justify-center gap-4 p-2 border rounded-sm select-none backdrop-blur-xl bg-neutral-900/10 border-neutral-500 aspect-square">
       <Transition
         as="span"
         show={currentHistory !== 0}

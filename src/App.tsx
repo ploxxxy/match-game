@@ -27,7 +27,9 @@ function App() {
           startGame={handleStartGame}
         />
       )}
-      {currentPage === 'game' && <Game playerGoesFirst={playerGoesFirst} n={n} m={m} />}
+      {currentPage === 'game' && (
+        <Game playerGoesFirst={playerGoesFirst} n={n} m={m} onBack={handleLeaveGame} />
+      )}
     </div>
   )
 }

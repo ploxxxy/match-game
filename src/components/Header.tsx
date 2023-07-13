@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ onLeave, disabled }) => {
       </button>
       <a
         className="hover:text-neutral-300"
-        href="https://github.com/ploxxy/match-game"
+        href="https://github.com/ploxxxy/match-game"
         target="_blank">
         <AiFillGithub size={24} />
       </a>
