@@ -10,7 +10,6 @@ export const canWin = (maxMatches: number, matches: number, computerMatches: num
   for (let i = 1; i <= maxMatches; i++) {
     if (matches - i === 0 || matches - i === 1) {
       if ((computerMatches + i) % 2 === 0) {
-        console.debug(`playing a non-standard move: -${i}`)
         return i
       }
     }

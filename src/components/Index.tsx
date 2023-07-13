@@ -20,7 +20,7 @@ const Index: React.FC<IndexProps> = ({
   startGame,
 }) => {
   return (
-    <div className="flex items-center justify-between max-w-2xl gap-24 p-8 mx-auto my-auto">
+    <div className="flex items-center justify-around w-full max-w-2xl p-8 mx-auto my-auto">
       <div className="flex flex-col gap-8">
         <div className="flex flex-col">
           <span>
@@ -54,10 +54,10 @@ const Index: React.FC<IndexProps> = ({
           />
         </div>
       </div>
-      <div>
-        <BsFillPlayCircleFill className="absolute text-green-400 animate-ping text-8xl" />
+      <div className="text-6xl sm:text-7xl lg:text-8xl">
+        <BsFillPlayCircleFill className="absolute text-green-400 animate-ping" />
         <BsFillPlayCircleFill
-          className="relative text-green-400 transition-colors duration-700 cursor-pointer drop-shadow-xl animate text-8xl hover:text-green-200"
+          className="relative text-green-400 transition-colors duration-700 cursor-pointer drop-shadow-xl hover:text-green-200"
           onClick={startGame}
         />
       </div>
