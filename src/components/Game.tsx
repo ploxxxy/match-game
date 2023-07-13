@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { canWin, clamp, didPlayerWin, makeMove } from '../utils/game'
+import { canWin, clamp, makeMove } from '../utils/game'
 import Modal from './Modal'
 import PlayButton from './PlayButton'
 import Avatar from './Avatar'
@@ -27,9 +27,10 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m, onBack }) => {
 
   const takeMatches = useCallback(
     (amount: number, computer = false) => {
-      if (matches === 0) return false
-
       const matchesLeft = matches - amount
+
+      // prevents the player from breaking spacetime continuum
+      if (matches === 0) return false
       if (matchesLeft < 0) return false
 
       setMatches(matchesLeft)
@@ -47,10 +48,11 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m, onBack }) => {
   )
 
   const handleWin = useCallback(() => {
-    setPlayerWon(didPlayerWin(playerMatches))
+    setPlayerWon(playerMatches % 2 === 0)
     setIsOpen(true)
   }, [playerMatches])
 
+  // computer logic cycle
   useEffect(() => {
     if (matches === 0) return handleWin()
     if (isPlayerTurn) return
@@ -58,6 +60,9 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m, onBack }) => {
     const winningMove = canWin(clampedMatches, matches, computerMatches)
 
     setTimeout(() => {
+      // checks if the computer should go first
+      // TODO: change it into a separate function
+      // that gets destroyed after the first move (?)
       if (matches === startingMatches && !playerGoesFirst) {
         takeMatches(winningMove || 2, true)
         return
@@ -71,15 +76,15 @@ const Game: React.FC<GameProps> = ({ playerGoesFirst, n, m, onBack }) => {
       takeMatches(makeMove(matches, m), true)
     }, 1000)
   }, [
-    isPlayerTurn,
     matches,
+    handleWin,
+    isPlayerTurn,
     clampedMatches,
     computerMatches,
-    handleWin,
-    m,
-    playerGoesFirst,
     startingMatches,
+    playerGoesFirst,
     takeMatches,
+    m,
   ])
 
   const handleReset = () => {

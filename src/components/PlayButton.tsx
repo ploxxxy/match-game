@@ -18,7 +18,8 @@ const PlayButton: React.FC<PlayButtonProps> = ({ onClick, text, danger, disabled
           'w-14 border-neutral-500 text-neutral-300 hover:bg-neutral-100 hover:text-neutral-900 active:bg-neutral-300',
         danger &&
           'px-4 border-red-600 hover:bg-red-600 active:bg-red-500 text-red-600 hover:text-white',
-        disabled && 'disabled:cursor-not-allowed disabled:bg-neutral-900 disabled:text-neutral-600 disabled:border-neutral-600'
+        disabled &&
+          'disabled:cursor-not-allowed disabled:bg-neutral-900 disabled:text-neutral-600 disabled:border-neutral-600'
       )}
       onClick={onClick}>
       {text}

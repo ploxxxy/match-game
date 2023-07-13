@@ -12,10 +12,13 @@ const Avatar: React.FC<AvatarProps> = ({ name, isAi, matches }) => {
   const [matchHistory, setMatchHistory] = useState<number[]>([])
   const [currentHistory, setCurrentHistory] = useState(0)
 
+  // Keeps track of matches played by the player
   useMemo(() => {
     setMatchHistory((m) => [...m, matches])
   }, [matches])
 
+  // Sets the currentHistory variable to be the difference between
+  // the last two turns. Essentially, calculates the previous move
   useEffect(() => {
     const length = matchHistory.length
     if (length < 2) return

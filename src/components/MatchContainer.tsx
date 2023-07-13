@@ -14,8 +14,11 @@ interface MatchesArrayProps {
 }
 
 const MatchContainer: React.FC<MatchContainerProps> = ({ startingMatches, matches, seed }) => {
+  // Creates an array that can take in { rotation, translationX, translationY }
+  // objects for our randomly positioned matches
   const [matchesArray, setMatchesArray] = useState<MatchesArrayProps[]>([])
 
+  // Populate the match array. Seed is used to reset match positions on game reset
   useMemo(() => {
     const initialMatches = Array.from({ length: startingMatches }, () => ({
       rotation: Math.random() * 360 + seed,
